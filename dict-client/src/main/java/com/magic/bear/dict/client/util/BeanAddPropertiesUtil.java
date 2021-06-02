@@ -1,53 +1,107 @@
 package com.magic.bear.dict.client.util;
 
+import com.magic.bear.dict.client.annotation.DictConvert;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.beans.BeanGenerator;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 /**
  * @author zxs
  * @date 2021/6/1 14:09
  * @desc
  */
+@Slf4j
 public class BeanAddPropertiesUtil {
+    //后期改为服务获取
+    private static Map<String, Map<String, String>> dictMap = new HashMap<>();
+
+    static {
+        Map<String, String> statusMap = new HashMap<>();
+        statusMap.put("0", "禁用");
+        statusMap.put("1", "开启");
+        dictMap.put("status", statusMap);
+        Map<String, String> sourceMap = new HashMap<>();
+
+        sourceMap.put("tb", "淘宝");
+        sourceMap.put("jd", "京东");
+        sourceMap.put("pdd", "拼多多");
+        dictMap.put("source", sourceMap);
+
+    }
 
     /**
      * 父对象+额外属性 生成子对象
      */
-    public static <T> T generatorNewBean(T dest) {
-        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
-        PropertyDescriptor[] descriptors = propertyUtilsBean.getPropertyDescriptors(dest);
-        //字段
+    public static <T> T generatorNewBean(T originBean) {
+
+        //原有字段
         Map<String, Class> propertyMap = new HashMap<>();
-        for (PropertyDescriptor d : descriptors) {
-            if (!"class".equalsIgnoreCase(d.getName())) {
-                propertyMap.put(d.getName(), d.getPropertyType());
+        //新增字段
+        Map<String, String> addProperties = new HashMap<>();
+        //原来所有field
+        List<Field> allFieldsList = FieldUtils.getAllFieldsList(originBean.getClass());
+
+        for (Field field : allFieldsList) {
+            propertyMap.put(field.getName(), field.getType());
+            DictConvert annotation = field.getAnnotation(DictConvert.class);
+            if (annotation == null) {
+                continue;
             }
+            String type = annotation.type();
+
+            String sourceKey = field.getName();
+
+            String targetKey = sourceKey + "Str";
+
+            if (StringUtils.isEmpty(type)) {
+                type = sourceKey;
+            }
+
+            field.setAccessible(true);
+
+            Object sourceValue = null;
+            try {
+                sourceValue = field.get(originBean);
+            } catch (IllegalAccessException e) {
+                log.error("属性获取值失败 {}", field.getName());
+            }
+            String targetValue = null;
+            if (sourceValue != null) {
+                Map<String, String> kv = dictMap.get(type);
+                if (kv != null) {
+                    targetValue = kv.get(sourceValue.toString());
+                }
+            }
+            addProperties.put(targetKey, targetValue);
+            propertyMap.put(targetKey, String.class);
         }
 
-        Map<String, Object> addProperties = ExtraPropertiesUtil.getExtraProp(dest);
 
+        DynamicBean<T> dynamicBean = new DynamicBean<T>((Class<T>) originBean.getClass(), propertyMap);
 
-        addProperties.forEach((k, v) -> propertyMap.put(k, v.getClass()));
-
-        DynamicBean<T> dynamicBean = new DynamicBean<T>((Class<T>) dest.getClass(), propertyMap);
-
-        // 添加原有属性的值
         propertyMap.forEach((k, v) -> {
             try {
-                // 防新旧冲突
-                if (!addProperties.containsKey(k)) {
-                    dynamicBean.setValue(k, propertyUtilsBean.getNestedProperty(dest, k));
+
+                if (addProperties.containsKey(k)) {
+                    // 添加新增的属性的值
+                    dynamicBean.setValue(k, addProperties.get(k));
+
+                }else{
+                    // 添加原有属性的值
+                    dynamicBean.setValue(k, FieldUtils.readField(originBean, k, true));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        // 添加新增的属性的值
-        addProperties.forEach(dynamicBean::setValue);
 
         return dynamicBean.getTarget();
     }

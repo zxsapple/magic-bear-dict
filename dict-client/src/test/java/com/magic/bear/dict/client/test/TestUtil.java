@@ -22,6 +22,8 @@ public class TestUtil {
         student.setSex("男");
         Student student2 = new Student("sam", 19, 0, "tb");
         Student student3 = new Student("lucy", null, null, "tb");
+        student2.setSex("男");
+        student3.setSex("男");
         List<Student> list = Arrays.asList(student, student2, student3);
         PageInfo<Student> pageInfo = new PageInfo<>();
         pageInfo.setListInfo(list);
@@ -33,7 +35,7 @@ public class TestUtil {
         result.setSuccess(true);
         long start = System.currentTimeMillis();
         System.out.println();
-        System.out.println(JSON.toJSONString(BeanAddPropertiesUtil.generatorNewBean(student)));
+        System.out.println(JSON.toJSONString(BeanAddPropertiesUtil.generatorNewBean(student3)));
         System.out.println(System.currentTimeMillis()-start);
     }
 
