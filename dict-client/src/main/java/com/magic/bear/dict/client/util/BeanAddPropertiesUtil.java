@@ -1,6 +1,7 @@
 package com.magic.bear.dict.client.util;
 
 import com.magic.bear.dict.client.annotation.DictConvert;
+import com.magic.bear.dict.client.dto.NewPropertyInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.beans.BeanGenerator;
 import net.sf.cglib.beans.BeanMap;
@@ -10,9 +11,8 @@ import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 /**
  * @author zxs
  * @date 2021/6/1 14:09
@@ -42,10 +42,12 @@ public class BeanAddPropertiesUtil {
      */
     public static <T> T generatorNewBean(T originBean) {
 
-        //原有字段
+        //原有字段 + 新增字段
         Map<String, Class> propertyMap = new HashMap<>();
-        //新增字段
-        Map<String, String> addProperties = new HashMap<>();
+        //原有字段与新字段关系
+        Map<String, NewPropertyInfoDto> origin2TargetMap = new HashMap<>();
+        //待转新字段
+        Set<String> targetSet = new HashSet<>();
         //原来所有field
         List<Field> allFieldsList = FieldUtils.getAllFieldsList(originBean.getClass());
 
@@ -59,28 +61,23 @@ public class BeanAddPropertiesUtil {
 
             String sourceKey = field.getName();
 
-            String targetKey = sourceKey + "Str";
+            String targetKey = annotation.targetKey();
 
+            //使用默认值
             if (StringUtils.isEmpty(type)) {
                 type = sourceKey;
             }
-
-            field.setAccessible(true);
-
-            Object sourceValue = null;
-            try {
-                sourceValue = field.get(originBean);
-            } catch (IllegalAccessException e) {
-                log.error("属性获取值失败 {}", field.getName());
+            if (StringUtils.isEmpty(targetKey)) {
+                targetKey = sourceKey + "Str";
             }
-            String targetValue = null;
-            if (sourceValue != null) {
-                Map<String, String> kv = dictMap.get(type);
-                if (kv != null) {
-                    targetValue = kv.get(sourceValue.toString());
-                }
-            }
-            addProperties.put(targetKey, targetValue);
+
+            NewPropertyInfoDto newPropertyInfoDto = new NewPropertyInfoDto();
+
+            newPropertyInfoDto.setType(type);
+            newPropertyInfoDto.setTargetKey(targetKey);
+
+            origin2TargetMap.put(sourceKey, newPropertyInfoDto);
+            targetSet.add(targetKey);
             propertyMap.put(targetKey, String.class);
         }
 
@@ -89,14 +86,22 @@ public class BeanAddPropertiesUtil {
 
         propertyMap.forEach((k, v) -> {
             try {
-
-                if (addProperties.containsKey(k)) {
-                    // 添加新增的属性的值
-                    dynamicBean.setValue(k, addProperties.get(k));
-
-                }else{
+                if (!targetSet.contains(k)) {
                     // 添加原有属性的值
-                    dynamicBean.setValue(k, FieldUtils.readField(originBean, k, true));
+                    Object sourceValue = FieldUtils.readField(originBean, k, true);
+                    dynamicBean.setValue(k, sourceValue);
+
+                    // 添加新增属性的值
+                    if (origin2TargetMap.containsKey(k)) {
+                        NewPropertyInfoDto newPropertyInfoDto = origin2TargetMap.get(k);
+                        if (sourceValue != null) {
+                            Map<String, String> kv = dictMap.get(newPropertyInfoDto.getType());
+                            if (kv != null) {
+                                String targetValue = kv.get(sourceValue.toString());
+                                dynamicBean.setValue(newPropertyInfoDto.getTargetKey(), targetValue);
+                            }
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

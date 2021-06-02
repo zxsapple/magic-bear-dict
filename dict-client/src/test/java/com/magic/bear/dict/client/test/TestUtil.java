@@ -33,10 +33,16 @@ public class TestUtil {
         result.setData(pageInfo);
         result.setMessage("success");
         result.setSuccess(true);
-        long start = System.currentTimeMillis();
-        System.out.println();
-        System.out.println(JSON.toJSONString(BeanAddPropertiesUtil.generatorNewBean(student3)));
-        System.out.println(System.currentTimeMillis()-start);
+        long start1 = System.currentTimeMillis();
+        Student student1 = BeanAddPropertiesUtil.generatorNewBean(student3);
+        long start2 = System.currentTimeMillis();
+        System.out.println(start2-start1 +"转换");
+        System.out.println(JSON.toJSONString(student1));
+        long start3 = System.currentTimeMillis();
+        System.out.println(start3-start2 +"json");
+        System.out.println(JSON.toJSONString(student));
+        long start4 = System.currentTimeMillis();
+        System.out.println(start4-start3 +"老json");
     }
 
 
