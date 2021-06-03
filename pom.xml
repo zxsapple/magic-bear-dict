@@ -9,10 +9,11 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>dict-client</module>
+        <module>dict-client-starter</module>
         <module>dict-server</module>
         <module>dict-service</module>
         <module>dict-dal</module>
+        <module>dict-web-demo</module>
     </modules>
 
     <parent>
