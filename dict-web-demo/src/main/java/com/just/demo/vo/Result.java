@@ -1,4 +1,4 @@
-package com.magic.bear.dict.client.test;
+package com.just.demo.vo;
 
 public class Result<T>  {
     private boolean success;

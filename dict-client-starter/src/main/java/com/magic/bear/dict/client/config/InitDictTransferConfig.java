@@ -31,7 +31,7 @@ import java.util.*;
 @Slf4j
 public class InitDictTransferConfig implements ImportAware {
     // 扫描的包名
-    public static final Map<Class<?>, DictTransferDto> CLASS_CACHE = new HashMap<>();
+    private static final Map<Class<?>, DictTransferDto> CLASS_CACHE = new HashMap<>();
 
     //新字段后缀
     private String targetFieldSuffix="Str";
@@ -49,7 +49,7 @@ public class InitDictTransferConfig implements ImportAware {
         scanUsedClass(basePackages);
     }
 
-    public void scanUsedClass(String[] basePackages) {
+    private void scanUsedClass(String[] basePackages) {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         final String RESOURCE_PATTERN = "/**/*.class";
 
@@ -125,5 +125,9 @@ public class InitDictTransferConfig implements ImportAware {
         dictTransferDto.setOrigin2TargetMap(origin2TargetMap);
         dictTransferDto.setTargetSet(targetSet);
         return dictTransferDto;
+    }
+
+    public static DictTransferDto getTransferConfigByClz(Class<?> clz) {
+        return CLASS_CACHE.get(clz);
     }
 }
