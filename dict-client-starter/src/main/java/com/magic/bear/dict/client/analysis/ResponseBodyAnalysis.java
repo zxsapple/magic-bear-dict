@@ -28,7 +28,7 @@ public class ResponseBodyAnalysis implements ResponseBodyAdvice {
 
         try {
             return transferDictBean(body);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("字典转换发生异常", e);
             return body;
         }
@@ -69,7 +69,7 @@ public class ResponseBodyAnalysis implements ResponseBodyAdvice {
 
         return dynamicBean.getTarget();
     }
-    //标准化返参 , map set 内不支持转换
+    //标准化返参 ,java自带类型只支持list map set等不支持转换
     public Object transferDictBean(Object obj) throws IllegalAccessException {
         if (obj == null) {
             return null;
@@ -101,13 +101,7 @@ public class ResponseBodyAnalysis implements ResponseBodyAdvice {
                 Class<?> fieldClz = field.getType();
                 if (List.class.isAssignableFrom(fieldClz)) {
 
-                    List<Object> list = (List<Object>) FieldUtils.readField(field, obj, true);
-//                    if (CollectionUtils.isEmpty(list)) continue;
-//                    for (int i = 0; i < list.size(); i++) {
-//                        Object newBean = transferDictBean(list.get(i));
-//                        //设置新值
-//                        list.set(i,newBean);
-//                    }
+                    List<?> list = (List<?>) FieldUtils.readField(field, obj, true);
                     transferDictBean(list);
                     //java 基础类型 &java自带类 泛型为Object除外
                 } else if (Object.class.equals(fieldClz) || (!fieldClz.getName().startsWith("java") && !fieldClz.isPrimitive())) {
