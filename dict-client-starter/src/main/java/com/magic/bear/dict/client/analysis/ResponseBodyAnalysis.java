@@ -1,10 +1,10 @@
 package com.magic.bear.dict.client.analysis;
 
 import com.magic.bear.dict.client.config.InitDictTransferConfig;
+import com.magic.bear.dict.client.config.SingleDictMap;
 import com.magic.bear.dict.client.dto.DictTransferDto;
 import com.magic.bear.dict.client.dto.DynamicBean;
 import com.magic.bear.dict.client.dto.NewPropertyInfoDto;
-import com.magic.bear.dict.client.util.DictMapGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.core.MethodParameter;
@@ -56,7 +56,7 @@ public class ResponseBodyAnalysis implements ResponseBodyAdvice {
                 if (dictTransferDto.getOrigin2TargetMap().containsKey(k)) {
                     NewPropertyInfoDto newPropertyInfoDto = dictTransferDto.getOrigin2TargetMap().get(k);
                     if (sourceValue != null) {
-                        Map<String, String> kv = DictMapGenerator.dictMap.get(newPropertyInfoDto.getType());
+                        Map<String, String> kv = SingleDictMap.getDictMap().get(newPropertyInfoDto.getType());
                         if (kv != null) {
                             String targetValue = kv.get(sourceValue.toString());
                             dynamicBean.setValue(newPropertyInfoDto.getTargetKey(), targetValue);
@@ -87,7 +87,7 @@ public class ResponseBodyAnalysis implements ResponseBodyAdvice {
             }
             return list;
         }
-
+        //其他java类型或基础类型 都不转换
         if (objClz.getName().startsWith("java") || objClz.isPrimitive()) {
             return obj;
         }

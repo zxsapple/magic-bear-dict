@@ -20,7 +20,7 @@ public class DictQueryController {
     @Autowired
     private IDictDataService dictDataService;
     /**
-     * 估计appId 获取字典集map
+     * 根据appId 获取字典集map
      */
     @RequestMapping("/getAppDictMap/{appId}")
     public Map<String, Map<String, String>> getAppDictMap(@PathVariable String appId) {

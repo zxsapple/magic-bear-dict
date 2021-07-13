@@ -7,6 +7,7 @@ import com.magic.bear.dict.client.dto.DictTransferDto;
 import com.magic.bear.dict.client.dto.NewPropertyInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportAware;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.Resource;
@@ -52,7 +53,7 @@ public class InitDictTransferConfig implements ImportAware {
     private void scanUsedClass(String[] basePackages) {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         final String RESOURCE_PATTERN = "/**/*.class";
-
+        List<Class<? extends AddDictMapTemplate>> templateClz = new ArrayList<>();
         try {
             for (String basePackage : basePackages) {
                 String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(basePackage) + RESOURCE_PATTERN;
@@ -65,16 +66,33 @@ public class InitDictTransferConfig implements ImportAware {
                         String className = reader.getClassMetadata().getClassName();
                         Class<?> clz = Class.forName(className);
                         //判断是否有指定注解
-                        OpenDict annotation = clz.getAnnotation(OpenDict.class);
-                        if (annotation != null) {
+                        if (clz.getAnnotation(OpenDict.class) != null) {
                             DictTransferDto dictTransferDto = getDictTransferDto(clz);
                             CLASS_CACHE.put(clz, dictTransferDto);
+                        } else if (AddDictMapTemplate.class.isAssignableFrom(clz)) {
+                            //添加dictMap的模板子类
+                            templateClz.add((Class<? extends AddDictMapTemplate>) clz);
                         }
                     }
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
             log.error("读取class失败", e);
+        }
+        initAddDictMapTemplate(templateClz);
+    }
+
+    /**
+     * 运行AddDictMapTemplate 的钩子函数
+     * @param templateClz
+     */
+    private void initAddDictMapTemplate(List<Class<? extends AddDictMapTemplate>> templateClz) {
+        for (Class<? extends AddDictMapTemplate> clz : templateClz) {
+            try {
+                clz.newInstance().addDictMap();
+            } catch (ReflectiveOperationException e) {
+                log.error("generator {} fail", clz.getName(),e);
+            }
         }
     }
 
