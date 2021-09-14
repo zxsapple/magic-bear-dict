@@ -1,0 +1,22 @@
+app.id: magic-bear-dict-server
+
+
+spring:
+  application:
+    name: ${app.id}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: u-nacos.yundasys.com:37775
+        namespace: 37ac103c-45f2-4785-9db0-93290f876dc8
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: themis
+    password: Dyaee2tvRKAOxdzI24V5
+    primary:
+      initial-size: 5
+      max-active: 50
+    url: jdbc:mysql://10.172.26.19:3405/dict?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
