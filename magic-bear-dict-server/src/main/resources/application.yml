@@ -1,0 +1,17 @@
+app.id: magic-bear-dict-server
+
+
+spring:
+  application:
+    name: ${app.id}
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    primary:
+      initial-size: 5
+      max-active: 50
+    url: jdbc:mysql://127.0.0.1:3306/magic_bear_dict?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8

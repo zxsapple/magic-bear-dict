@@ -1,6 +1,6 @@
 package com.magic.bear.dict.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.magic.bear.dict.dal.entity.SysDictData;
 import com.magic.bear.dict.dal.mapper.SysDictDataMapper;
@@ -26,8 +26,8 @@ public class DictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictD
 
     @Override
     public Map<String, Map<String, String>> getAppDictMap(String appId) {
-        QueryWrapper<SysDictData> queryWrapper = new QueryWrapper<SysDictData>();
-        queryWrapper.eq("app_id", appId).eq("status", 1);
+        LambdaQueryWrapper<SysDictData> queryWrapper = new LambdaQueryWrapper<SysDictData>();
+        queryWrapper.eq(SysDictData::getAppId, appId).eq(SysDictData::getStatus, 1);
         List<SysDictData> list = sysDictDataMapper.selectList(queryWrapper);
         Map<String, List<SysDictData>> collect = list.stream().collect(Collectors.groupingBy(SysDictData::getDictType));
         Map<String, Map<String, String>> distMap = new HashMap<>(collect.size());

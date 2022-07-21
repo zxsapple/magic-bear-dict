@@ -23,14 +23,19 @@ public class SysDictType extends BaseEntity{
     private Integer dictTypeId;
 
     /**
+     * 字典类型
+     */
+    private String dictType;
+
+    /**
      * 字典名称
      */
     private String dictTypeName;
 
     /**
-     * 字典类型
+     * 系统
      */
-    private String dictType;
+    private String appId;
 
     /**
      * 备注

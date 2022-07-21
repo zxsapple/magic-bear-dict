@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * @author zxs
  * @date 2021/6/15 13:26
- * @desc 供查询字典集
+ * @desc 供client-starter查询字典集
  */
 @RestController
 @RequestMapping("/client/dict")
-public class DictQueryController {
+public class DictApiController {
 
     @Autowired
     private IDictDataService dictDataService;

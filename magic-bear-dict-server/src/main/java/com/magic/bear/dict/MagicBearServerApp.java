@@ -13,9 +13,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 @SpringBootApplication
 @MapperScan(basePackages = "com.magic.bear.dict.dal.mapper")
-public class App {
+public class MagicBearServerApp {
     public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(MagicBearServerApp.class, args);
         log.warn("==== magic-bear-dict-server launch success ====");
     }
 }
