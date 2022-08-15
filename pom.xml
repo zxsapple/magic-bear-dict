@@ -11,8 +11,6 @@
     <modules>
         <module>magic-bear-dict-client-starter</module>
         <module>magic-bear-dict-server</module>
-        <module>magic-bear-dict-service</module>
-        <module>magic-bear-dict-dal</module>
         <module>magic-bear-dict-web-demo</module>
     </modules>
 

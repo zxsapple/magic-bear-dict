@@ -3,8 +3,6 @@ package com.magic.bear.dict.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.magic.bear.dict.dal.entity.SysUserApp;
 
-import java.util.Map;
-
 /**
  * @author zxs
  * @date 2021/6/15 13:41
