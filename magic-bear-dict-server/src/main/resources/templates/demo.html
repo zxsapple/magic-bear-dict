@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html">
+    <title>通讯录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <script type="text/javascript" src="jquery/jquery-3.2.1.min.js"></script>
+
+    <script src="layui/layui.js" charset="utf-8"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+</head>
+<body>
+
+<blockquote class="layui-elem-quote">
+
+    <!--搜索维度  -->
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" id='name0' name="name0" lay-verify="required" placeholder="请输入联系人姓名"
+                       autocomplete="true" class="layui-input">
+            </div>
+            <button class="layui-btn layui-btn-normal layui-btn-radius" data-type="reload" id='name1'><i class="layui-icon">&#xe615;</i>查询
+            </button>
+        </div>
+    </div>
+</blockquote>
+
+<!--数据表格-->
+<table class="layui-hide" id="test" lay-filter="demo"></table>
+
+<!-- 添加的弹出层开始 -->
+<div style="display: none;padding: 20px" id="saveOrUpdateDiv" >
+    <form class="layui-form"  lay-filter="dataFrm" id="dataFrm">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户姓名:</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id">
+                    <input type="text" name="name" lay-verify="required|nm"  lay-reqtext="姓名必填" placeholder="请输入用户姓名" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">电话号码:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="number" lay-verify="required|num" lay-reqtext="号码必填" placeholder="请输入用户电话号码" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doSubmit" lay-submit="">提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 修改的弹出层开始 -->
+<div style="display: none;padding: 20px" id="saveOrUpdateDiv1" >
+    <form class="layui-form"  lay-filter="dataFrm1" id="dataFrm1">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户姓名:</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id">
+                    <input type="text" name="name" lay-verify="required"   placeholder="请输入用户姓名" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">电话号码:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="number" lay-verify="required"  placeholder="请输入用户电话号码" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doEditSubmit" lay-submit="">提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn  layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn  layui-btn-primary layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="add">新增</a>
+</script>
+
+<script>
+    layui.use(['table','form'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var url;
+        var mainIndex;
+        //温馨提示：默认由前端自动合计当前行数据。从 layui 2.5.6 开始： 若接口直接返回了合计行数据，则优先读取接口合计行数据。
+        //详见：https://www.layui.com/doc/modules/table.html#totalRow
+        tableIns = table.render({
+            elem: '#test'
+            , url: '/user/find'
+            , toolbar: '#toolbarDemo'
+            , title: '用户数据表'
+            , totalRow: true
+            , method: 'GET'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'id', width: 200, fixed: 'left', unresize: true, sort: true}
+                , {field: 'name', title: '姓名', width: 200, edit: 'text'}
+                , {field: 'number', title: '电话号码', width: 250, edit: 'text'}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 250}
+            ]]
+
+            //分页显示
+            , page: true
+            , total: true
+            , totalPage: true
+            //,closeBtn: 0
+        });
+    }
+</script>
+</body>
+</html>

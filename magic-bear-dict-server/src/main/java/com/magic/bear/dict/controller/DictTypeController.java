@@ -1,15 +1,16 @@
 package com.magic.bear.dict.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.magic.bear.dict.dal.entity.SysDictType;
 import com.magic.bear.dict.service.IDictTypeService;
+import com.magic.bear.dict.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author zxs
@@ -23,21 +24,20 @@ public class DictTypeController {
     @Autowired
     private IDictTypeService dictTypeService;
 
-    @PostMapping("/list")
-    public List<SysDictType> list(SysDictType dictType) {
+    @PostMapping("/pageList")
+    public ResultVO<Page<SysDictType>> pageList(SysDictType dictType) {
 
-        LambdaQueryWrapper<SysDictType> queryWrapper = new LambdaQueryWrapper<>();
-        if (!StringUtils.isEmpty(dictType.getDictType())) {
-            queryWrapper.like(SysDictType::getDictType, dictType.getDictType());
-        }
-        if (!StringUtils.isEmpty(dictType.getDictTypeName())) {
-            queryWrapper.like(SysDictType::getDictTypeName, dictType.getDictTypeName());
-        }
-        if (!StringUtils.isEmpty(dictType.getAppId())) {
-            queryWrapper.eq(SysDictType::getAppId, dictType.getAppId());
-        }
-        List<SysDictType> list = dictTypeService.list(queryWrapper);
-        return list;
+        HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        String pageStr = request.getParameter("page");
+        String sizeStr = request.getParameter("limit");
+
+        int pageNum = StringUtils.isEmpty(pageStr) ? 1 : Integer.parseInt(pageStr);
+        int pageSize = StringUtils.isEmpty(sizeStr) ? 10 : Integer.parseInt(sizeStr);
+
+        Page<SysDictType> sysDictTypePage = dictTypeService.pageList(dictType, pageNum, pageSize);
+
+        return ResultVO.success(sysDictTypePage);
     }
+
 
 }

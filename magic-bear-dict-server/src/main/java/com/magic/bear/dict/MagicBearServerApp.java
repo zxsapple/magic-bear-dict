@@ -18,4 +18,5 @@ public class MagicBearServerApp {
         SpringApplication.run(MagicBearServerApp.class, args);
         log.warn("==== magic-bear-dict-server launch success ====");
     }
+
 }

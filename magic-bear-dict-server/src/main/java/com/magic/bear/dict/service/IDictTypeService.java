@@ -1,5 +1,6 @@
 package com.magic.bear.dict.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.magic.bear.dict.dal.entity.SysDictType;
 
@@ -9,4 +10,5 @@ import com.magic.bear.dict.dal.entity.SysDictType;
  * @desc
  */
 public interface IDictTypeService extends IService<SysDictType> {
+    Page<SysDictType> pageList(SysDictType queryWrapper, int pageNum, int pageSize);
 }

@@ -15,3 +15,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+
+  thymeleaf:
+    mode: LEGACYHTML5
+    #开发配置为false，避免修改模板还要重启服务器
+    cache: false
+    content-type: text/html
