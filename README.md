@@ -1,4 +1,4 @@
-# magic-bear-dict-parent
+# magic-bear-dict
 
 ### 介绍
 magic-bear-dict-client-starter 通过springMvc拦截 + cglib 将字典类型自动注入到返回参数中
