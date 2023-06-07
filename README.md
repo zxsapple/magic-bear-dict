@@ -4,8 +4,10 @@
 magic-bear-dict-client-starter 通过springMvc拦截 + cglib 将字典类型自动注入到返回参数中
 
 ### 软件架构
-基于spring-boot-web的开发
-
+##### 基于spring-boot-web的开发
+##### starter - 可独立使用的springboot插件
+##### server - 控制台
+##### demo - 可执行的demo
 ### 客户端使用
 ##### 核心代码在client里 使用了springMvc拦截+cglib的动态代理自动新增待翻译的字段name
 #### 使用步骤(demo见 magic-bear-dict-web-demo)
