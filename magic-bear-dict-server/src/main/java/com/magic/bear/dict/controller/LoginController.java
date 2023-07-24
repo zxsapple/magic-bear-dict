@@ -24,6 +24,6 @@ public class LoginController {
 
         userInfoService.login(username, password);
 
-        return null;
+        return ResultVO.success();
     }
 }
