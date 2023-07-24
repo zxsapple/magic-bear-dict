@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * @author zxs
  * @date 2021/6/3 9:38
- * @desc
+ * @desc 需转换的class 缓存
  */
 @Slf4j
 public class InitDictTransferConfig implements ImportAware {
